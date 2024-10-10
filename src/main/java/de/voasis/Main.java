@@ -13,7 +13,7 @@ import net.minestom.server.instance.block.Block;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println("v2 by Aquestry");
+        System.out.println("SimpleDuels by Aquestry");
         MinecraftServer minecraftServer = MinecraftServer.init();
         InstanceManager instanceManager = MinecraftServer.getInstanceManager();
         InstanceContainer instanceContainer = instanceManager.createInstanceContainer();

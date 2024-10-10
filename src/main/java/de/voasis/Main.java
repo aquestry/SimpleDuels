@@ -32,7 +32,7 @@ public class Main {
         globalEventHandler.addListener(AsyncPlayerConfigurationEvent.class, event -> {
             final Player player = event.getPlayer();
             event.setSpawningInstance(instanceContainer);
-            player.setRespawnPoint(new Pos(0, 41, 0));
+            player.setRespawnPoint(new Pos(0, 42, 0));
         });
 
         instanceContainer.setChunkSupplier(LightingChunk::new);

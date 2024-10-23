@@ -17,7 +17,7 @@
         <dependency>
             <groupId>net.minestom</groupId>
             <artifactId>minestom-snapshots</artifactId>
-            <version>bcb0301fb1</version>
+            <version>1_21_2-febfe26a2c</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>

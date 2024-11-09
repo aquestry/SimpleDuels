@@ -38,7 +38,7 @@ public class Main {
     }
 
     public static void sendToLobby(Player player) {
-        String message = "lobby";
+        String message = "lobby:" + player.getUsername();
         PluginMessagePacket packet = new PluginMessagePacket(
                 "nebula:main",
                 message.getBytes(StandardCharsets.UTF_8)

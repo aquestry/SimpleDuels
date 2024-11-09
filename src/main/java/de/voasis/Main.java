@@ -6,6 +6,7 @@ import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
 import net.minestom.server.event.player.PlayerChatEvent;
+import net.minestom.server.event.player.PlayerStartDiggingEvent;
 import net.minestom.server.extras.velocity.VelocityProxy;
 import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.instance.InstanceManager;
@@ -30,7 +31,8 @@ public class Main {
             event.setSpawningInstance(instanceContainer);
             event.getPlayer().setRespawnPoint(new Pos(0, 41, 0));
         });
-        globalEventHandler.addListener(PlayerChatEvent.class, event -> {
+        globalEventHandler.addListener(PlayerStartDiggingEvent.class, event -> {
+            System.out.println("Send to Lobby");
             sendToLobby(event.getPlayer());
         });
         instanceContainer.setChunkSupplier(LightingChunk::new);

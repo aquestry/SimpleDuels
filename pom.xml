@@ -13,12 +13,6 @@
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-    <repositories>
-        <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
-        </repository>
-    </repositories>
     <dependencies>
         <dependency>
             <groupId>net.minestom</groupId>
@@ -29,11 +23,6 @@
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>1.4.11</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.TogAr2</groupId>
-            <artifactId>MinestomPvP</artifactId>
-            <version>04180dd</version>
         </dependency>
     </dependencies>
     <build>

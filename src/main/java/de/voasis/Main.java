@@ -1,8 +1,5 @@
 package de.voasis;
 
-import io.github.togar2.pvp.MinestomPvP;
-import io.github.togar2.pvp.feature.CombatFeatureSet;
-import io.github.togar2.pvp.feature.CombatFeatures;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Player;
@@ -22,14 +19,9 @@ import java.nio.charset.StandardCharsets;
 public class Main {
     public static void main(String[] args) {
         MinecraftServer minecraftServer = MinecraftServer.init();
-        MinestomPvP.init();
-
         InstanceManager instanceManager = MinecraftServer.getInstanceManager();
         InstanceContainer instanceContainer = instanceManager.createInstanceContainer();
         instanceContainer.setGenerator(unit -> unit.modifier().fillHeight(0, 40, Block.GRASS_BLOCK));
-        CombatFeatureSet modernVanilla = CombatFeatures.modernVanilla();
-        MinecraftServer.getGlobalEventHandler().addChild(modernVanilla.createNode());
-
         if(System.getenv("PAPER_VELOCITY_SECRET") instanceof String vsecret) {
             VelocityProxy.enable(vsecret);
             System.out.println("v-secret: " + vsecret);

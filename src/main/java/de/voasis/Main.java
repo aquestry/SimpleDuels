@@ -5,7 +5,6 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
-import net.minestom.server.event.player.PlayerChatEvent;
 import net.minestom.server.event.player.PlayerStartDiggingEvent;
 import net.minestom.server.extras.velocity.VelocityProxy;
 import net.minestom.server.instance.InstanceContainer;
@@ -13,7 +12,6 @@ import net.minestom.server.instance.InstanceManager;
 import net.minestom.server.instance.LightingChunk;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.network.packet.server.common.PluginMessagePacket;
-
 import java.nio.charset.StandardCharsets;
 
 public class Main {
@@ -38,6 +36,7 @@ public class Main {
         instanceContainer.setChunkSupplier(LightingChunk::new);
         minecraftServer.start("0.0.0.0", 25565);
     }
+
     public static void sendToLobby(Player player) {
         String message = "lobby";
         PluginMessagePacket packet = new PluginMessagePacket(

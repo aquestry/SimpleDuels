@@ -1,5 +1,6 @@
 package de.voasis;
 
+import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Player;
@@ -20,10 +21,14 @@ import net.minestom.server.network.packet.server.common.PluginMessagePacket;
 import java.nio.charset.StandardCharsets;
 
 public class Main {
+    private static InstanceContainer instanceContainer;
+    private static final Pos SPAWN_POINT_1 = new Pos(-10, 41, 0, 90, 0);
+    private static final Pos SPAWN_POINT_2 = new Pos(10, 41, 0, -90, 0);
+    private static boolean firstPlayerJoined = false;
     public static void main(String[] args) {
         MinecraftServer minecraftServer = MinecraftServer.init();
         InstanceManager instanceManager = MinecraftServer.getInstanceManager();
-        InstanceContainer instanceContainer = instanceManager.createInstanceContainer();
+        instanceContainer = instanceManager.createInstanceContainer();
         instanceContainer.setGenerator(unit -> unit.modifier().fillHeight(0, 40, Block.GRASS_BLOCK));
         if(System.getenv("PAPER_VELOCITY_SECRET") instanceof String vsecret) {
             VelocityProxy.enable(vsecret);
@@ -31,13 +36,18 @@ public class Main {
         }
         GlobalEventHandler globalEventHandler = MinecraftServer.getGlobalEventHandler();
         globalEventHandler.addListener(AsyncPlayerConfigurationEvent.class, event -> {
+            Player player = event.getPlayer();
+            Pos spawnPosition = firstPlayerJoined ? SPAWN_POINT_2 : SPAWN_POINT_1;
+            firstPlayerJoined = true;
             event.setSpawningInstance(instanceContainer);
-            event.getPlayer().setRespawnPoint(new Pos(0, 41, 0));
+            player.setRespawnPoint(spawnPosition);
         });
         globalEventHandler.addListener(PlayerSpawnEvent.class, event -> event.getPlayer().getInventory().addItemStack(ItemStack.builder(Material.IRON_AXE).build()));
         globalEventHandler.addListener(PlayerDeathEvent.class, event -> {
+            event.setDeathText(Component.empty());
             for(Player p : instanceContainer.getPlayers()) {
                 sendToLobby(p);
+
             }
         });
         globalEventHandler.addListener(EntityAttackEvent.class, event -> {
@@ -45,7 +55,6 @@ public class Main {
                 handlePlayerAttack(attacker, target);
             }
         });
-
         instanceContainer.setChunkSupplier(LightingChunk::new);
         minecraftServer.start("0.0.0.0", 25565);
     }
@@ -62,10 +71,14 @@ public class Main {
     public static void handlePlayerAttack(Player attacker, Player target) {
         target.damage(Damage.fromPlayer(attacker, 4));
         target.setHealth(Math.max(target.getHealth() - 4, 0));
-        Pos direction = target.getPosition().sub(attacker.getPosition()).mul(3);
+        Pos direction = target.getPosition().sub(attacker.getPosition()).mul(5);
         target.setVelocity(target.getVelocity().add(direction.x(), 0.5, direction.z()));
         if (target.getHealth() <= 0) {
             target.kill();
+            for(Player p : instanceContainer.getPlayers()) {
+                p.sendMessage(Component.text(attacker.getUsername() + " has won the game."));
+            }
         }
+
     }
 }

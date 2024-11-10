@@ -21,10 +21,12 @@ import net.minestom.server.network.packet.server.common.PluginMessagePacket;
 import java.nio.charset.StandardCharsets;
 
 public class Main {
+
     private static InstanceContainer instanceContainer;
-    private static final Pos SPAWN_POINT_1 = new Pos(-10, 41, 0, 90, 0);
-    private static final Pos SPAWN_POINT_2 = new Pos(10, 41, 0, -90, 0);
+    private static final Pos SPAWN_POINT_1 = new Pos(-10, 41, 0, -90, 0);
+    private static final Pos SPAWN_POINT_2 = new Pos(10, 41, 0, 90, 0);
     private static boolean firstPlayerJoined = false;
+
     public static void main(String[] args) {
         MinecraftServer minecraftServer = MinecraftServer.init();
         InstanceManager instanceManager = MinecraftServer.getInstanceManager();
@@ -44,6 +46,7 @@ public class Main {
         });
         globalEventHandler.addListener(PlayerSpawnEvent.class, event -> event.getPlayer().getInventory().addItemStack(ItemStack.builder(Material.IRON_AXE).build()));
         globalEventHandler.addListener(PlayerDeathEvent.class, event -> {
+            event.setChatMessage(Component.empty());
             event.setDeathText(Component.empty());
             for(Player p : instanceContainer.getPlayers()) {
                 sendToLobby(p);
@@ -71,14 +74,13 @@ public class Main {
     public static void handlePlayerAttack(Player attacker, Player target) {
         target.damage(Damage.fromPlayer(attacker, 4));
         target.setHealth(Math.max(target.getHealth() - 4, 0));
-        Pos direction = target.getPosition().sub(attacker.getPosition()).mul(5);
-        target.setVelocity(target.getVelocity().add(direction.x(), 0.5, direction.z()));
+        Pos direction = target.getPosition().sub(attacker.getPosition()).mul(7);
+        target.setVelocity(target.getVelocity().add(direction.x(), 1, direction.z()));
         if (target.getHealth() <= 0) {
             target.kill();
             for(Player p : instanceContainer.getPlayers()) {
                 p.sendMessage(Component.text(attacker.getUsername() + " has won the game."));
             }
         }
-
     }
 }

@@ -19,69 +19,69 @@ import net.minestom.server.instance.block.Block;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.network.packet.server.common.PluginMessagePacket;
-import net.minestom.server.timer.Scheduler;
-import net.minestom.server.timer.Task;
-
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Random;
 
 public class Main {
 
     private static InstanceContainer instanceContainer;
-    private static final Pos SPAWN_POINT_1 = new Pos(-10, 41, 0, -90, 0);
-    private static final Pos SPAWN_POINT_2 = new Pos(10, 41, 0, 90, 0);
-    private static final List<Player> tomove = new ArrayList<>();
+    private static final Random random = new Random();
 
     public static void main(String[] args) {
         MinecraftServer minecraftServer = MinecraftServer.init();
         InstanceManager instanceManager = MinecraftServer.getInstanceManager();
         instanceContainer = instanceManager.createInstanceContainer();
         instanceContainer.setGenerator(unit -> unit.modifier().fillHeight(0, 40, Block.GRASS_BLOCK));
-        if(System.getenv("PAPER_VELOCITY_SECRET") instanceof String vsecret) {
+
+        String vsecret = System.getenv("PAPER_VELOCITY_SECRET");
+        if (vsecret != null) {
             VelocityProxy.enable(vsecret);
             System.out.println("v-secret: " + vsecret);
         }
+
         GlobalEventHandler globalEventHandler = MinecraftServer.getGlobalEventHandler();
 
         globalEventHandler.addListener(AsyncPlayerConfigurationEvent.class, event -> {
             Player player = event.getPlayer();
-            Scheduler scheduler = player.scheduler();
+            Pos randomSpawnPoint = new Pos(
+                    -10 + random.nextInt(10),
+                    41,
+                    -10 + random.nextInt(10),
+                    random.nextFloat() * 360,
+                    0
+            );
             event.setSpawningInstance(instanceContainer);
-            player.setRespawnPoint(SPAWN_POINT_1);
-            tomove.add(player);
-            Task task = scheduler.scheduleNextTick(Main::updateQueue);
-            task.cancel();
+            player.setRespawnPoint(randomSpawnPoint);
         });
-        globalEventHandler.addListener(PlayerSpawnEvent.class, event -> event.getPlayer().getInventory().addItemStack(ItemStack.builder(Material.IRON_AXE).build()));
+
+        globalEventHandler.addListener(PlayerSpawnEvent.class, event ->
+                event.getPlayer().getInventory().addItemStack(ItemStack.builder(Material.IRON_AXE).build())
+        );
+
         globalEventHandler.addListener(PlayerDeathEvent.class, event -> {
             event.setChatMessage(Component.empty());
-            for(Player p : instanceContainer.getPlayers()) {
+            for (Player p : instanceContainer.getPlayers()) {
                 sendToLobby(p);
             }
         });
+
         globalEventHandler.addListener(EntityAttackEvent.class, event -> {
-            if (event.getEntity() instanceof Player attacker && event.getTarget() instanceof Player target && attacker.getInventory().getItemInMainHand().isSimilar(ItemStack.builder(Material.IRON_AXE).build())) {
+            if (event.getEntity() instanceof Player attacker && event.getTarget() instanceof Player target &&
+                    attacker.getInventory().getItemInMainHand().isSimilar(ItemStack.builder(Material.IRON_AXE).build())) {
                 handlePlayerAttack(attacker, target);
             }
         });
+
         globalEventHandler.addListener(PlayerDisconnectEvent.class, event -> {
-            for(Player p : instanceContainer.getPlayers()) {
-                if(!p.equals(event.getPlayer())) {
+            for (Player p : instanceContainer.getPlayers()) {
+                if (!p.equals(event.getPlayer())) {
                     sendToLobby(p);
                 }
             }
         });
+
         instanceContainer.setChunkSupplier(LightingChunk::new);
         minecraftServer.start("0.0.0.0", 25565);
-    }
-
-    public static void updateQueue() {
-        if(tomove.getFirst() != null && tomove.get(1) != null) {
-            tomove.getFirst().teleport(SPAWN_POINT_2);
-            tomove.get(1).teleport(SPAWN_POINT_1);
-            tomove.removeFirst();
-        }
     }
 
     public static void sendToLobby(Player player) {
@@ -100,7 +100,7 @@ public class Main {
         target.setVelocity(target.getVelocity().add(direction.x(), 1, direction.z()));
         if (target.getHealth() <= 0) {
             target.kill();
-            for(Player p : instanceContainer.getPlayers()) {
+            for (Player p : instanceContainer.getPlayers()) {
                 p.sendMessage(Component.text(attacker.getUsername() + " has won the game."));
             }
         }

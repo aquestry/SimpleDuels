@@ -20,14 +20,15 @@ import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.network.packet.server.common.PluginMessagePacket;
 import java.nio.charset.StandardCharsets;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Main {
 
     private static InstanceContainer instanceContainer;
     private static final Pos SPAWN_POINT_1 = new Pos(-10, 41, 0, -90, 0);
     private static final Pos SPAWN_POINT_2 = new Pos(10, 41, 0, 90, 0);
-    private static final AtomicBoolean toggleSpawn = new AtomicBoolean(false);
+    private static final List<Player> tomove = new ArrayList<>();
 
     public static void main(String[] args) {
         MinecraftServer minecraftServer = MinecraftServer.init();
@@ -41,11 +42,11 @@ public class Main {
         GlobalEventHandler globalEventHandler = MinecraftServer.getGlobalEventHandler();
         globalEventHandler.addListener(AsyncPlayerConfigurationEvent.class, event -> {
             Player player = event.getPlayer();
-            Pos spawnPosition = toggleSpawn.get() ? SPAWN_POINT_2 : SPAWN_POINT_1;
-            toggleSpawn.set(true);
             event.setSpawningInstance(instanceContainer);
-            player.setRespawnPoint(spawnPosition);
+            player.setRespawnPoint(SPAWN_POINT_1);
+            tomove.add(player);
         });
+        globalEventHandler.addListener(PlayerSpawnEvent.class, event -> updateQueue());
         globalEventHandler.addListener(PlayerSpawnEvent.class, event -> event.getPlayer().getInventory().addItemStack(ItemStack.builder(Material.IRON_AXE).build()));
         globalEventHandler.addListener(PlayerDeathEvent.class, event -> {
             event.setChatMessage(Component.empty());
@@ -67,6 +68,13 @@ public class Main {
         });
         instanceContainer.setChunkSupplier(LightingChunk::new);
         minecraftServer.start("0.0.0.0", 25565);
+    }
+
+    public static void updateQueue() {
+        if(tomove.getFirst() != null) {
+            tomove.getFirst().teleport(SPAWN_POINT_2);
+            tomove.removeFirst();
+        }
     }
 
     public static void sendToLobby(Player player) {

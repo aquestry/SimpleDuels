@@ -54,12 +54,9 @@ public class Main {
             player.setRespawnPoint(randomSpawnPoint);
         });
 
-        globalEventHandler.addListener(PlayerSpawnEvent.class, event ->
-                event.getPlayer().getInventory().addItemStack(ItemStack.builder(Material.IRON_AXE).build())
-        );
+        globalEventHandler.addListener(PlayerSpawnEvent.class, event -> event.getPlayer().getInventory().addItemStack(ItemStack.builder(Material.IRON_AXE).build()));
 
         globalEventHandler.addListener(PlayerDeathEvent.class, event -> {
-            event.setChatMessage(Component.empty());
             for (Player p : instanceContainer.getPlayers()) {
                 sendToLobby(p);
             }

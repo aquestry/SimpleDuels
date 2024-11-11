@@ -32,15 +32,12 @@ public class Main {
         InstanceManager instanceManager = MinecraftServer.getInstanceManager();
         instanceContainer = instanceManager.createInstanceContainer();
         instanceContainer.setGenerator(unit -> unit.modifier().fillHeight(0, 40, Block.GRASS_BLOCK));
-
         String vsecret = System.getenv("PAPER_VELOCITY_SECRET");
         if (vsecret != null) {
             VelocityProxy.enable(vsecret);
             System.out.println("v-secret: " + vsecret);
         }
-
         GlobalEventHandler globalEventHandler = MinecraftServer.getGlobalEventHandler();
-
         globalEventHandler.addListener(AsyncPlayerConfigurationEvent.class, event -> {
             Player player = event.getPlayer();
             Pos randomSpawnPoint = new Pos(
@@ -53,23 +50,19 @@ public class Main {
             event.setSpawningInstance(instanceContainer);
             player.setRespawnPoint(randomSpawnPoint);
         });
-
         globalEventHandler.addListener(PlayerSpawnEvent.class, event -> event.getPlayer().getInventory().addItemStack(ItemStack.builder(Material.IRON_AXE).build()));
-
         globalEventHandler.addListener(PlayerDeathEvent.class, event -> {
-            event.setDeathText(null);
+            event.setChatMessage(null);
             for (Player p : instanceContainer.getPlayers()) {
                 sendToLobby(p);
             }
         });
-
         globalEventHandler.addListener(EntityAttackEvent.class, event -> {
             if (event.getEntity() instanceof Player attacker && event.getTarget() instanceof Player target &&
                     attacker.getInventory().getItemInMainHand().isSimilar(ItemStack.builder(Material.IRON_AXE).build())) {
                 handlePlayerAttack(attacker, target);
             }
         });
-
         globalEventHandler.addListener(PlayerDisconnectEvent.class, event -> {
             for (Player p : instanceContainer.getPlayers()) {
                 if (!p.equals(event.getPlayer())) {
@@ -77,7 +70,6 @@ public class Main {
                 }
             }
         });
-
         instanceContainer.setChunkSupplier(LightingChunk::new);
         minecraftServer.start("0.0.0.0", 25565);
     }

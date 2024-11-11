@@ -28,19 +28,7 @@ public class Main {
         MinecraftServer minecraftServer = MinecraftServer.init();
         InstanceManager instanceManager = MinecraftServer.getInstanceManager();
         instanceContainer = instanceManager.createInstanceContainer();
-        instanceContainer.setGenerator(unit -> {
-            unit.modifier().fillHeight(0, 1, Block.STONE_BRICKS);
-            for (int y = 1; y <= 10; y++) {
-                for (int x = -22; x <= 22; x++) {
-                    unit.modifier().setBlock(x, y, -22, Block.STONE_BRICKS);
-                    unit.modifier().setBlock(x, y, 22, Block.STONE_BRICKS);
-                }
-                for (int z = -22; z <= 22; z++) {
-                    unit.modifier().setBlock(-22, y, z, Block.STONE_BRICKS);
-                    unit.modifier().setBlock(22, y, z, Block.STONE_BRICKS);
-                }
-            }
-        });
+        instanceContainer.setGenerator(unit -> unit.modifier().fillHeight(0, 41, Block.STONE_BRICKS));
         String vsecret = System.getenv("PAPER_VELOCITY_SECRET");
         if (vsecret != null) {
             VelocityProxy.enable(vsecret);

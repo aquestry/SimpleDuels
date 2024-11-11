@@ -9,6 +9,7 @@ import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.entity.EntityAttackEvent;
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
 import net.minestom.server.event.player.PlayerDeathEvent;
+import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerSpawnEvent;
 import net.minestom.server.extras.velocity.VelocityProxy;
 import net.minestom.server.instance.InstanceContainer;
@@ -50,12 +51,18 @@ public class Main {
             event.setChatMessage(Component.empty());
             for(Player p : instanceContainer.getPlayers()) {
                 sendToLobby(p);
-
             }
         });
         globalEventHandler.addListener(EntityAttackEvent.class, event -> {
             if (event.getEntity() instanceof Player attacker && event.getTarget() instanceof Player target) {
                 handlePlayerAttack(attacker, target);
+            }
+        });
+        globalEventHandler.addListener(PlayerDisconnectEvent.class, event -> {
+            for(Player p : instanceContainer.getPlayers()) {
+                if(!p.equals(event.getPlayer())) {
+                    sendToLobby(p);
+                }
             }
         });
         instanceContainer.setChunkSupplier(LightingChunk::new);

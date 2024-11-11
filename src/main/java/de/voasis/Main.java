@@ -57,6 +57,7 @@ public class Main {
         globalEventHandler.addListener(PlayerSpawnEvent.class, event -> event.getPlayer().getInventory().addItemStack(ItemStack.builder(Material.IRON_AXE).build()));
 
         globalEventHandler.addListener(PlayerDeathEvent.class, event -> {
+            event.setDeathText(Component.empty());
             for (Player p : instanceContainer.getPlayers()) {
                 sendToLobby(p);
             }

@@ -7,10 +7,7 @@ import net.minestom.server.entity.Player;
 import net.minestom.server.entity.damage.Damage;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.entity.EntityAttackEvent;
-import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
-import net.minestom.server.event.player.PlayerDeathEvent;
-import net.minestom.server.event.player.PlayerDisconnectEvent;
-import net.minestom.server.event.player.PlayerSpawnEvent;
+import net.minestom.server.event.player.*;
 import net.minestom.server.extras.velocity.VelocityProxy;
 import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.instance.InstanceManager;
@@ -31,7 +28,19 @@ public class Main {
         MinecraftServer minecraftServer = MinecraftServer.init();
         InstanceManager instanceManager = MinecraftServer.getInstanceManager();
         instanceContainer = instanceManager.createInstanceContainer();
-        instanceContainer.setGenerator(unit -> unit.modifier().fillHeight(0, 40, Block.STONE_BRICKS));
+        instanceContainer.setGenerator(unit -> {
+            unit.modifier().fillHeight(0, 1, Block.STONE_BRICKS);
+            for (int y = 1; y <= 10; y++) {
+                for (int x = -22; x <= 22; x++) {
+                    unit.modifier().setBlock(x, y, -22, Block.STONE_BRICKS);
+                    unit.modifier().setBlock(x, y, 22, Block.STONE_BRICKS);
+                }
+                for (int z = -22; z <= 22; z++) {
+                    unit.modifier().setBlock(-22, y, z, Block.STONE_BRICKS);
+                    unit.modifier().setBlock(22, y, z, Block.STONE_BRICKS);
+                }
+            }
+        });
         String vsecret = System.getenv("PAPER_VELOCITY_SECRET");
         if (vsecret != null) {
             VelocityProxy.enable(vsecret);
@@ -42,7 +51,7 @@ public class Main {
             Player player = event.getPlayer();
             Pos randomSpawnPoint = new Pos(
                     -10 + random.nextInt(10),
-                    41,
+                    11,
                     -10 + random.nextInt(10),
                     random.nextFloat() * 360,
                     0
@@ -57,6 +66,7 @@ public class Main {
                 sendToLobby(p);
             }
         });
+        globalEventHandler.addListener(PlayerBlockBreakEvent.class, event -> event.setCancelled(true));
         globalEventHandler.addListener(EntityAttackEvent.class, event -> {
             if (event.getEntity() instanceof Player attacker && event.getTarget() instanceof Player target &&
                     attacker.getInventory().getItemInMainHand().isSimilar(ItemStack.builder(Material.IRON_AXE).build())) {

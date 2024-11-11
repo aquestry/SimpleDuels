@@ -19,6 +19,9 @@ import net.minestom.server.instance.block.Block;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.network.packet.server.common.PluginMessagePacket;
+import net.minestom.server.timer.Scheduler;
+import net.minestom.server.timer.Task;
+
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,13 +43,16 @@ public class Main {
             System.out.println("v-secret: " + vsecret);
         }
         GlobalEventHandler globalEventHandler = MinecraftServer.getGlobalEventHandler();
+
         globalEventHandler.addListener(AsyncPlayerConfigurationEvent.class, event -> {
             Player player = event.getPlayer();
+            Scheduler scheduler = player.scheduler();
             event.setSpawningInstance(instanceContainer);
             player.setRespawnPoint(SPAWN_POINT_1);
             tomove.add(player);
+            Task task = scheduler.scheduleNextTick(Main::updateQueue);
+            task.cancel();
         });
-        globalEventHandler.addListener(PlayerSpawnEvent.class, event -> updateQueue());
         globalEventHandler.addListener(PlayerSpawnEvent.class, event -> event.getPlayer().getInventory().addItemStack(ItemStack.builder(Material.IRON_AXE).build()));
         globalEventHandler.addListener(PlayerDeathEvent.class, event -> {
             event.setChatMessage(Component.empty());
@@ -55,7 +61,7 @@ public class Main {
             }
         });
         globalEventHandler.addListener(EntityAttackEvent.class, event -> {
-            if (event.getEntity() instanceof Player attacker && event.getTarget() instanceof Player target) {
+            if (event.getEntity() instanceof Player attacker && event.getTarget() instanceof Player target && attacker.getInventory().getItemInMainHand().isSimilar(ItemStack.builder(Material.IRON_AXE).build())) {
                 handlePlayerAttack(attacker, target);
             }
         });

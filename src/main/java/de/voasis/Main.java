@@ -31,7 +31,7 @@ public class Main {
         MinecraftServer minecraftServer = MinecraftServer.init();
         InstanceManager instanceManager = MinecraftServer.getInstanceManager();
         instanceContainer = instanceManager.createInstanceContainer();
-        instanceContainer.setGenerator(unit -> unit.modifier().fillHeight(0, 40, Block.GRASS_BLOCK));
+        instanceContainer.setGenerator(unit -> unit.modifier().fillHeight(0, 40, Block.STONE_BRICKS));
         String vsecret = System.getenv("PAPER_VELOCITY_SECRET");
         if (vsecret != null) {
             VelocityProxy.enable(vsecret);

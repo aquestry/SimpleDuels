@@ -77,8 +77,9 @@ public class Main {
     }
 
     public static void updateQueue() {
-        if(tomove.getFirst() != null) {
+        if(tomove.getFirst() != null && tomove.get(1) != null) {
             tomove.getFirst().teleport(SPAWN_POINT_2);
+            tomove.get(1).teleport(SPAWN_POINT_1);
             tomove.removeFirst();
         }
     }

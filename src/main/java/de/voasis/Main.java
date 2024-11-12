@@ -34,7 +34,7 @@ public class Main {
         String vsecret = System.getenv("PAPER_VELOCITY_SECRET");
         if (vsecret != null) {
             VelocityProxy.enable(vsecret);
-            System.out.println("v-secret: " + vsecret);
+            System.out.println("secret: " + vsecret);
         }
         GlobalEventHandler globalEventHandler = MinecraftServer.getGlobalEventHandler();
         globalEventHandler.addListener(AsyncPlayerConfigurationEvent.class, event -> {

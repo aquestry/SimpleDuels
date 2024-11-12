@@ -28,7 +28,19 @@ public class Main {
         MinecraftServer minecraftServer = MinecraftServer.init();
         InstanceManager instanceManager = MinecraftServer.getInstanceManager();
         instanceContainer = instanceManager.createInstanceContainer();
-        instanceContainer.setGenerator(unit -> unit.modifier().fillHeight(0, 41, Block.STONE_BRICKS));
+        instanceContainer.setGenerator(unit -> {
+            unit.modifier().fillHeight(0, 1, Block.STONE_BRICKS);
+            for (int y = 1; y <= 10; y++) {
+                for (int x = -22; x <= 22; x++) {
+                    unit.modifier().setBlock(x, y, -22, Block.STONE_BRICKS);
+                    unit.modifier().setBlock(x, y, 22, Block.STONE_BRICKS);
+                }
+                for (int z = -22; z <= 22; z++) {
+                    unit.modifier().setBlock(-22, y, z, Block.STONE_BRICKS);
+                    unit.modifier().setBlock(22, y, z, Block.STONE_BRICKS);
+                }
+            }
+        });
         String vsecret = System.getenv("PAPER_VELOCITY_SECRET");
         if (vsecret != null) {
             VelocityProxy.enable(vsecret);
@@ -38,16 +50,18 @@ public class Main {
         globalEventHandler.addListener(AsyncPlayerConfigurationEvent.class, event -> {
             Player player = event.getPlayer();
             Pos randomSpawnPoint = new Pos(
-                    -10 + random.nextInt(10),
-                    11,
-                    -10 + random.nextInt(10),
+                    -10 + random.nextInt(20),
+                    1, // Höhe auf dem Boden
+                    -10 + random.nextInt(20),
                     random.nextFloat() * 360,
                     0
             );
             event.setSpawningInstance(instanceContainer);
             player.setRespawnPoint(randomSpawnPoint);
         });
-        globalEventHandler.addListener(PlayerSpawnEvent.class, event -> event.getPlayer().getInventory().addItemStack(ItemStack.builder(Material.IRON_AXE).build()));
+        globalEventHandler.addListener(PlayerSpawnEvent.class, event ->
+                event.getPlayer().getInventory().addItemStack(ItemStack.builder(Material.IRON_AXE).build()));
+
         globalEventHandler.addListener(PlayerDeathEvent.class, event -> {
             event.setChatMessage(null);
             for (Player p : instanceContainer.getPlayers()) {

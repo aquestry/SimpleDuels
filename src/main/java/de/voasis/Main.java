@@ -32,7 +32,7 @@ public class Main {
         fill(new Pos(-22, 0, -22), new Pos(22, 10, -22), Block.STONE_BRICKS);
         fill(new Pos(-22, 0, 22), new Pos(22, 10, 22), Block.STONE_BRICKS);
         fill(new Pos(-22, 0, -22), new Pos(-22, 10, 22), Block.STONE_BRICKS);
-        fill(new Pos(-22, 0, 22), new Pos(-22, 10, -22), Block.STONE_BRICKS);
+        fill(new Pos(22, 0, -22), new Pos(22, 10, 22), Block.STONE_BRICKS);
         String vsecret = System.getenv("PAPER_VELOCITY_SECRET");
         if (vsecret != null) {
             VelocityProxy.enable(vsecret);

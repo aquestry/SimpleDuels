@@ -29,10 +29,6 @@ public class Main {
         InstanceManager instanceManager = MinecraftServer.getInstanceManager();
         instanceContainer = instanceManager.createInstanceContainer();
         instanceContainer.setGenerator(unit -> unit.modifier().fillHeight(0, 1, Block.STONE_BRICKS));
-        fill(new Pos(-22, 0, -22), new Pos(22, 10, -22), Block.STONE_BRICKS);
-        fill(new Pos(-22, 0, 22), new Pos(22, 10, 22), Block.STONE_BRICKS);
-        fill(new Pos(-22, 0, -22), new Pos(-22, 10, 22), Block.STONE_BRICKS);
-        fill(new Pos(22, 0, -22), new Pos(22, 10, 22), Block.STONE_BRICKS);
         String vsecret = System.getenv("PAPER_VELOCITY_SECRET");
         if (vsecret != null) {
             VelocityProxy.enable(vsecret);
@@ -96,22 +92,6 @@ public class Main {
             target.kill();
             for (Player p : instanceContainer.getPlayers()) {
                 p.sendMessage(Component.text(attacker.getUsername() + " has won the game."));
-            }
-        }
-    }
-
-    public static void fill(Pos pos1, Pos pos2, Block block) {
-        int minX = Math.min(pos1.blockX(), pos2.blockX());
-        int maxX = Math.max(pos1.blockX(), pos2.blockX());
-        int minY = Math.min(pos1.blockY(), pos2.blockY());
-        int maxY = Math.max(pos1.blockY(), pos2.blockY());
-        int minZ = Math.min(pos1.blockZ(), pos2.blockZ());
-        int maxZ = Math.max(pos1.blockZ(), pos2.blockZ());
-        for (int x = minX; x <= maxX; x++) {
-            for (int y = minY; y <= maxY; y++) {
-                for (int z = minZ; z <= maxZ; z++) {
-                    instanceContainer.setBlock(x, y, z, block);
-                }
             }
         }
     }

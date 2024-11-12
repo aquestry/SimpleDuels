@@ -16,6 +16,8 @@ import net.minestom.server.instance.block.Block;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.network.packet.server.common.PluginMessagePacket;
+import net.minestom.server.network.packet.server.play.BlockChangePacket;
+
 import java.nio.charset.StandardCharsets;
 import java.util.Random;
 
@@ -47,6 +49,10 @@ public class Main {
             event.setSpawningInstance(instanceContainer);
             player.setRespawnPoint(randomSpawnPoint);
         });
+        fill(new Pos(-22, 0, -22), new Pos(22, 10, -22), Block.STONE_BRICKS); // Nordwand
+        fill(new Pos(-22, 0, 22), new Pos(22, 10, 22), Block.STONE_BRICKS);   // Südwand
+        fill(new Pos(-22, 0, -22), new Pos(-22, 10, 22), Block.STONE_BRICKS); // Westwand
+        fill(new Pos(22, 0, -22), new Pos(22, 10, 22), Block.STONE_BRICKS);   // Ostwand
         globalEventHandler.addListener(PlayerSpawnEvent.class, event -> event.getPlayer().getInventory().addItemStack(ItemStack.builder(Material.IRON_AXE).build()));
         globalEventHandler.addListener(PlayerDeathEvent.class, event -> {
             event.setChatMessage(null);
@@ -89,6 +95,26 @@ public class Main {
             target.kill();
             for (Player p : instanceContainer.getPlayers()) {
                 p.sendMessage(Component.text(attacker.getUsername() + " has won the game."));
+            }
+        }
+    }
+
+    public static void fill(Pos pos1, Pos pos2, Block block) {
+        int minX = Math.min(pos1.blockX(), pos2.blockX());
+        int maxX = Math.max(pos1.blockX(), pos2.blockX());
+        int minY = Math.min(pos1.blockY(), pos2.blockY());
+        int maxY = Math.max(pos1.blockY(), pos2.blockY());
+        int minZ = Math.min(pos1.blockZ(), pos2.blockZ());
+        int maxZ = Math.max(pos1.blockZ(), pos2.blockZ());
+        for (int x = minX; x <= maxX; x++) {
+            for (int y = minY; y <= maxY; y++) {
+                for (int z = minZ; z <= maxZ; z++) {
+                    instanceContainer.setBlock(x, y, z, block);
+                    BlockChangePacket blockChangePacket = new BlockChangePacket(new Pos(x, y, z), block.stateId());
+                    for (Player player : instanceContainer.getPlayers()) {
+                        player.sendPacket(blockChangePacket);
+                    }
+                }
             }
         }
     }

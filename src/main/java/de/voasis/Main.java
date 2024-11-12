@@ -58,8 +58,7 @@ public class Main {
         });
         globalEventHandler.addListener(PlayerBlockBreakEvent.class, event -> event.setCancelled(true));
         globalEventHandler.addListener(EntityAttackEvent.class, event -> {
-            if (event.getEntity() instanceof Player attacker && event.getTarget() instanceof Player target &&
-                    attacker.getInventory().getItemInMainHand().isSimilar(ItemStack.builder(Material.IRON_AXE).build())) {
+            if (event.getEntity() instanceof Player attacker && event.getTarget() instanceof Player target && attacker.getInventory().getItemInMainHand().isSimilar(ItemStack.builder(Material.IRON_AXE).build())) {
                 handlePlayerAttack(attacker, target);
             }
         });

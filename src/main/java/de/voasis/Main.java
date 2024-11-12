@@ -16,8 +16,6 @@ import net.minestom.server.instance.block.Block;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.network.packet.server.common.PluginMessagePacket;
-import net.minestom.server.network.packet.server.play.BlockChangePacket;
-
 import java.nio.charset.StandardCharsets;
 import java.util.Random;
 
@@ -49,10 +47,6 @@ public class Main {
             event.setSpawningInstance(instanceContainer);
             player.setRespawnPoint(randomSpawnPoint);
         });
-        fill(new Pos(-22, 0, -22), new Pos(22, 10, -22), Block.STONE_BRICKS); // Nordwand
-        fill(new Pos(-22, 0, 22), new Pos(22, 10, 22), Block.STONE_BRICKS);   // Südwand
-        fill(new Pos(-22, 0, -22), new Pos(-22, 10, 22), Block.STONE_BRICKS); // Westwand
-        fill(new Pos(22, 0, -22), new Pos(22, 10, 22), Block.STONE_BRICKS);   // Ostwand
         globalEventHandler.addListener(PlayerSpawnEvent.class, event -> event.getPlayer().getInventory().addItemStack(ItemStack.builder(Material.IRON_AXE).build()));
         globalEventHandler.addListener(PlayerDeathEvent.class, event -> {
             event.setChatMessage(null);
@@ -62,6 +56,10 @@ public class Main {
         });
         globalEventHandler.addListener(PlayerBlockBreakEvent.class, event -> event.setCancelled(true));
         globalEventHandler.addListener(EntityAttackEvent.class, event -> {
+            fill(new Pos(-22, 0, -22), new Pos(22, 10, -22), Block.STONE_BRICKS); // Nordwand
+            fill(new Pos(-22, 0, 22), new Pos(22, 10, 22), Block.STONE_BRICKS);   // Südwand
+            fill(new Pos(-22, 0, -22), new Pos(-22, 10, 22), Block.STONE_BRICKS); // Westwand
+            fill(new Pos(22, 0, -22), new Pos(22, 10, 22), Block.STONE_BRICKS);   // Ostwand
             if (event.getEntity() instanceof Player attacker && event.getTarget() instanceof Player target && attacker.getInventory().getItemInMainHand().isSimilar(ItemStack.builder(Material.IRON_AXE).build())) {
                 handlePlayerAttack(attacker, target);
             }
@@ -73,6 +71,7 @@ public class Main {
                 }
             }
         });
+
         instanceContainer.setChunkSupplier(LightingChunk::new);
         minecraftServer.start("0.0.0.0", 25565);
     }
@@ -110,10 +109,7 @@ public class Main {
             for (int y = minY; y <= maxY; y++) {
                 for (int z = minZ; z <= maxZ; z++) {
                     instanceContainer.setBlock(x, y, z, block);
-                    BlockChangePacket blockChangePacket = new BlockChangePacket(new Pos(x, y, z), block.stateId());
-                    for (Player player : instanceContainer.getPlayers()) {
-                        player.sendPacket(blockChangePacket);
-                    }
+                    System.out.println("Playing Block on: " + x + ", " + y + ", " + z);
                 }
             }
         }

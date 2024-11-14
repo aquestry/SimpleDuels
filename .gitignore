@@ -6,3 +6,9 @@
 *.iws
 *.iml
 *.ipr
+
+target/classes
+target/generated-sources
+target/maven-archiver
+target/maven-status
+target/original-server.jar

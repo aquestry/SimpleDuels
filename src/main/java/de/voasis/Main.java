@@ -71,7 +71,6 @@ public class Main {
                 }
             }
         });
-
         instanceContainer.setChunkSupplier(LightingChunk::new);
         minecraftServer.start("0.0.0.0", 25565);
     }

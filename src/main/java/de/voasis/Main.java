@@ -29,11 +29,8 @@ public class Main {
         InstanceManager instanceManager = MinecraftServer.getInstanceManager();
         instanceContainer = instanceManager.createInstanceContainer();
         instanceContainer.setGenerator(unit -> unit.modifier().fillHeight(0, 1, Block.STONE_BRICKS));
-        String vsecret = System.getenv("PAPER_VELOCITY_SECRET");
-        if (vsecret != null) {
-            VelocityProxy.enable(vsecret);
-            System.out.println("secret: " + vsecret);
-        }
+        var vsecret = System.getenv("PAPER_VELOCITY_SECRET");
+        if (vsecret != null) { VelocityProxy.enable(vsecret); }
         GlobalEventHandler globalEventHandler = MinecraftServer.getGlobalEventHandler();
         globalEventHandler.addListener(AsyncPlayerConfigurationEvent.class, event -> {
             Player player = event.getPlayer();

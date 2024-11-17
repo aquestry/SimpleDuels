@@ -27,6 +27,7 @@ public class Main {
     public static void main(String[] args) {
         MinecraftServer minecraftServer = MinecraftServer.init();
         InstanceManager instanceManager = MinecraftServer.getInstanceManager();
+        MinecraftServer.getCommandManager().register(new LeaveCommand());
         instanceContainer = instanceManager.createInstanceContainer();
         instanceContainer.setGenerator(unit -> unit.modifier().fillHeight(0, 1, Block.STONE_BRICKS));
         var vsecret = System.getenv("PAPER_VELOCITY_SECRET");

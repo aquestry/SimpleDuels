@@ -44,17 +44,15 @@ public class Main {
             );
             event.setSpawningInstance(instanceContainer);
             player.setRespawnPoint(randomSpawnPoint);
-            fill(new Pos(-22, 0, -22), new Pos(22, 10, -22), Block.STONE_BRICKS); // Nordwand
-            fill(new Pos(-22, 0, 22), new Pos(22, 10, 22), Block.STONE_BRICKS);   // Südwand
-            fill(new Pos(-22, 0, -22), new Pos(-22, 10, 22), Block.STONE_BRICKS); // Westwand
-            fill(new Pos(22, 0, -22), new Pos(22, 10, 22), Block.STONE_BRICKS);   // Ostwand
+            fill(new Pos(-22, 0, -22), new Pos(22, 10, -22), Block.STONE_BRICKS);
+            fill(new Pos(-22, 0, 22), new Pos(22, 10, 22), Block.STONE_BRICKS);
+            fill(new Pos(-22, 0, -22), new Pos(-22, 10, 22), Block.STONE_BRICKS);
+            fill(new Pos(22, 0, -22), new Pos(22, 10, 22), Block.STONE_BRICKS);
         });
         globalEventHandler.addListener(PlayerSpawnEvent.class, event -> event.getPlayer().getInventory().addItemStack(ItemStack.builder(Material.IRON_AXE).build()));
         globalEventHandler.addListener(PlayerDeathEvent.class, event -> {
             event.setChatMessage(null);
-            for (Player p : instanceContainer.getPlayers()) {
-                sendToLobby(p);
-            }
+            quitAll();
         });
         globalEventHandler.addListener(PlayerBlockBreakEvent.class, event -> event.setCancelled(true));
         globalEventHandler.addListener(EntityAttackEvent.class, event -> {
@@ -62,13 +60,7 @@ public class Main {
                 handlePlayerAttack(attacker, target);
             }
         });
-        globalEventHandler.addListener(PlayerDisconnectEvent.class, event -> {
-            for (Player p : instanceContainer.getPlayers()) {
-                if (!p.equals(event.getPlayer())) {
-                    sendToLobby(p);
-                }
-            }
-        });
+        globalEventHandler.addListener(PlayerDisconnectEvent.class, event -> quitAll());
         instanceContainer.setChunkSupplier(LightingChunk::new);
         minecraftServer.start("0.0.0.0", 25565);
     }
@@ -92,6 +84,12 @@ public class Main {
             for (Player p : instanceContainer.getPlayers()) {
                 p.sendMessage(Component.text(attacker.getUsername() + " has won the game."));
             }
+        }
+    }
+
+    public static void quitAll() {
+        for (Player p : instanceContainer.getPlayers()) {
+            sendToLobby(p);
         }
     }
 

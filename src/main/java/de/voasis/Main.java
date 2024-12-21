@@ -20,10 +20,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Random;
 
 public class Main {
-
     private static InstanceContainer instanceContainer;
     private static final Random random = new Random();
-
     public static void main(String[] args) {
         MinecraftServer minecraftServer = MinecraftServer.init();
         InstanceManager instanceManager = MinecraftServer.getInstanceManager();
@@ -64,7 +62,6 @@ public class Main {
         instanceContainer.setChunkSupplier(LightingChunk::new);
         minecraftServer.start("0.0.0.0", 25565);
     }
-
     public static void sendToLobby(Player player) {
         String message = "lobby:" + player.getUsername();
         PluginMessagePacket packet = new PluginMessagePacket(
@@ -73,7 +70,6 @@ public class Main {
         );
         player.sendPacket(packet);
     }
-
     public static void handlePlayerAttack(Player attacker, Player target) {
         target.damage(Damage.fromPlayer(attacker, 4));
         target.setHealth(Math.max(target.getHealth() - 4, 0));
@@ -86,13 +82,11 @@ public class Main {
             }
         }
     }
-
     public static void quitAll() {
         for (Player p : instanceContainer.getPlayers()) {
             sendToLobby(p);
         }
     }
-
     public static void fill(Pos pos1, Pos pos2, Block block) {
         int minX = Math.min(pos1.blockX(), pos2.blockX());
         int maxX = Math.max(pos1.blockX(), pos2.blockX());

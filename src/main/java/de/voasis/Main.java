@@ -32,6 +32,7 @@ public class Main {
         var vsecret = System.getenv("PAPER_VELOCITY_SECRET");
         if (vsecret != null) { VelocityProxy.enable(vsecret); }
         GlobalEventHandler globalEventHandler = MinecraftServer.getGlobalEventHandler();
+        new NameTagHandler();
         globalEventHandler.addListener(AsyncPlayerConfigurationEvent.class, event -> {
             Player player = event.getPlayer();
             Pos randomSpawnPoint = new Pos(

@@ -16,6 +16,11 @@
             <artifactId>minestom-snapshots</artifactId>
             <version>1_21_4-35869c40fb</version>
         </dependency>
+        <dependency>
+            <groupId>net.kyori</groupId>
+            <artifactId>adventure-text-minimessage</artifactId>
+            <version>4.17.0</version>
+        </dependency>
     </dependencies>
     <build>
         <finalName>server</finalName>

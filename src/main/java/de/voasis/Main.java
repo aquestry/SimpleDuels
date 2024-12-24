@@ -48,18 +48,18 @@ public class Main {
             fill(new Pos(22, 0, -22), new Pos(22, 10, 22), Block.STONE_BRICKS);
         });
         globalEventHandler.addListener(PlayerSpawnEvent.class, event -> event.getPlayer().getInventory().addItemStack(ItemStack.builder(Material.IRON_AXE).build()));
-        globalEventHandler.addListener(PlayerDeathEvent.class, event -> {
-            event.setChatMessage(null);
-            quitAll();
-        });
         globalEventHandler.addListener(PlayerChatEvent.class, event -> event.setCancelled(true));
         globalEventHandler.addListener(PlayerBlockBreakEvent.class, event -> event.setCancelled(true));
+        globalEventHandler.addListener(PlayerDisconnectEvent.class, event -> quitAll());
         globalEventHandler.addListener(EntityAttackEvent.class, event -> {
             if (event.getEntity() instanceof Player attacker && event.getTarget() instanceof Player target && attacker.getItemInMainHand().isSimilar(ItemStack.builder(Material.IRON_AXE).build())) {
                 handlePlayerAttack(attacker, target);
             }
         });
-        globalEventHandler.addListener(PlayerDisconnectEvent.class, event -> quitAll());
+        globalEventHandler.addListener(PlayerDeathEvent.class, event -> {
+            event.setChatMessage(null);
+            quitAll();
+        });
         instanceContainer.setChunkSupplier(LightingChunk::new);
         minecraftServer.start("0.0.0.0", 25565);
     }

@@ -24,7 +24,7 @@ public class NebulaAPI {
             Player player = event.getPlayer();
             int attempts = 0;
             while (attempts < 10) {
-                if (player.getPlayerConnection().getConnectionState().equals(ConnectionState.PLAY)) {
+                if (player.getPlayerConnection().getConnectionState().equals(ConnectionState.PLAY) && player.getInstance() != null) {
                     switch (identifier) {
                         case "nebula:main" -> handleNametagEvent(message);
                         case "nebula:scoreboard" -> handleScoreboardEvent(message);

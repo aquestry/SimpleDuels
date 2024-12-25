@@ -17,7 +17,7 @@ import net.minestom.server.scoreboard.Sidebar;
 public class NebulaAPI {
     public NebulaAPI() {
         Main.globalEventHandler.addListener(PlayerDisconnectEvent.class, event -> event.getPlayer().getPassengers().forEach(Entity::remove));
-        Main.globalEventHandler.addListener(PlayerPluginMessageEvent.class, event -> {
+        Main.globalEventHandler.addListener(PlayerPluginMessageEvent.class, event -> new Thread(() -> {
             String identifier = event.getIdentifier();
             String message = event.getMessageString();
             Player player = event.getPlayer();
@@ -45,7 +45,7 @@ public class NebulaAPI {
             if (attempts == 10) {
                 System.err.println("Failed to process plugin message after 10 attempts: " + identifier);
             }
-        });
+        }));
     }
 
     private void handleNametagEvent(String message) {

@@ -13,39 +13,36 @@ import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerPluginMessageEvent;
 import net.minestom.server.network.ConnectionState;
 import net.minestom.server.scoreboard.Sidebar;
+import net.minestom.server.timer.Task;
+import net.minestom.server.timer.TaskSchedule;
 
 public class NebulaAPI {
     public NebulaAPI() {
         Main.globalEventHandler.addListener(PlayerDisconnectEvent.class, event -> event.getPlayer().getPassengers().forEach(Entity::remove));
-        Main.globalEventHandler.addListener(PlayerPluginMessageEvent.class, event -> new Thread(() -> {
+        Main.globalEventHandler.addListener(PlayerPluginMessageEvent.class, event -> {
             String identifier = event.getIdentifier();
             String message = event.getMessageString();
             Player player = event.getPlayer();
-            if(!identifier.equals("nebula:main") && !identifier.equals("nebula:scoreboard")) { return;}
+            if (!identifier.equals("nebula:main") && !identifier.equals("nebula:scoreboard")) { return; }
             System.out.println("Channel: " + identifier + " Message: " + message);
-            int attempts = 0;
-            while (attempts < 10) {
+            final int[] attempts = {0};
+            final Task[] taskHolder = new Task[1];
+            taskHolder[0] = MinecraftServer.getSchedulerManager().buildTask(() -> {
                 if (player.getPlayerConnection().getConnectionState().equals(ConnectionState.PLAY) && player.getInstance() != null) {
                     switch (identifier) {
                         case "nebula:main" -> handleNametagEvent(message);
                         case "nebula:scoreboard" -> handleScoreboardEvent(message);
                     }
-                    break;
+                    taskHolder[0].cancel();
                 } else {
-                    attempts++;
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                        System.err.println("Interrupted while waiting for player connection state: " + e.getMessage());
-                        break;
+                    attempts[0]++;
+                    if (attempts[0] >= 10) {
+                        taskHolder[0].cancel();
+                        System.err.println("Failed to process plugin message after 10 attempts: " + identifier);
                     }
                 }
-            }
-            if (attempts == 10) {
-                System.err.println("Failed to process plugin message after 10 attempts: " + identifier);
-            }
-        }));
+            }).repeat(TaskSchedule.seconds(1)).delay(TaskSchedule.seconds(1)).schedule();
+        });
     }
 
     private void handleNametagEvent(String message) {

@@ -11,6 +11,7 @@ import net.minestom.server.entity.metadata.display.AbstractDisplayMeta;
 import net.minestom.server.entity.metadata.display.TextDisplayMeta;
 import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerPluginMessageEvent;
+import net.minestom.server.network.ConnectionState;
 import net.minestom.server.scoreboard.Sidebar;
 
 public class NebulaAPI {
@@ -20,51 +21,81 @@ public class NebulaAPI {
             String identifier = event.getIdentifier();
             String message = event.getMessageString();
             System.out.println("Channel: " + identifier + " Message: " + message);
-            if(identifier.equals("nebula:main")) {
-                String playerName = message.split(":")[0];
-                Player player = MinecraftServer.getConnectionManager().getOnlinePlayerByUsername(playerName);
-                if(player != null && player.getPassengers().isEmpty()) {
-                    String newName = message.split(":")[1].split("#")[2] + player.getUsername();
-                    System.out.println("Player: " + playerName + " New Name: " + newName);
-                    createNametag(player, newName);
+            Player player = MinecraftServer.getConnectionManager().getOnlinePlayerByUsername(message.split(":")[0]);
+            int attempts = 0;
+            while (attempts < 10) {
+                if (player.getPlayerConnection().getConnectionState().equals(ConnectionState.PLAY)) {
+                    switch (identifier) {
+                        case "nebula:main" -> handleNametagEvent(message);
+                        case "nebula:scoreboard" -> handleScoreboardEvent(message);
+                        default -> System.out.println("Unknown identifier: " + identifier);
+                    }
+                    break;
+                } else {
+                    attempts++;
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        System.err.println("Interrupted while waiting for player connection state: " + e.getMessage());
+                        break;
+                    }
                 }
             }
-            if (event.getIdentifier().equals("nebula:scoreboard")) {
-                String[] parts = message.split("&");
-                if (parts.length >= 3) {
-                    String username = parts[0];
-                    String title = parts[1];
-                    String[] lines = parts[2].split("#");
-                    System.out.println("Title: " + title);
-                    System.out.println("Lines:");
-                    for (int i = 0; i < lines.length; i++) {
-                        System.out.println("Line " + i + ": " + lines[i]);
-                    }
-                    Player player = MinecraftServer.getConnectionManager().getOnlinePlayerByUsername(username);
-                    if (player != null) {
-                        Sidebar sidebar = new Sidebar(MiniMessage.miniMessage().deserialize(title));
-                        for (int i = 0; i < lines.length; i++) {
-                            String lineId = "line_" + i;
-                            String lineText = lines[i];
-                            System.out.println("Adding Line " + i + ": " + lineText);
-                            sidebar.createLine(new Sidebar.ScoreboardLine(
-                                    lineId,
-                                    MiniMessage.miniMessage().deserialize(lineText),
-                                    (lines.length - i),
-                                    Sidebar.NumberFormat.blank()
-                            ));
-                        }
-                        sidebar.addViewer(player);
-                        System.out.println("Scoreboard erfolgreich aktualisiert für: " + username);
-                    } else {
-                        System.err.println("Spieler nicht gefunden: " + username);
-                    }
-                } else {
-                    System.err.println("Ungültiges Scoreboard-Nachrichtenformat: " + message);
-                }
+            if (attempts == 10) {
+                System.err.println("Failed to process plugin message after 10 attempts: " + identifier);
             }
         });
     }
+
+    private void handleNametagEvent(String message) {
+        try {
+            String[] parts = message.split(":");
+            String playerName = parts[0];
+            String newName = parts[1].split("#")[2] + playerName;
+            Player player = MinecraftServer.getConnectionManager().getOnlinePlayerByUsername(playerName);
+            if (player != null && player.getPassengers().isEmpty()) {
+                System.out.println("Player: " + playerName + " New Name: " + newName);
+                createNametag(player, newName);
+            }
+        } catch (Exception e) {
+            System.err.println("Error handling nametag event: " + e.getMessage());
+        }
+    }
+
+    private void handleScoreboardEvent(String message) {
+        try {
+            String[] parts = message.split("&");
+            if (parts.length < 3) {
+                System.err.println("Invalid Scoreboard message format: " + message);
+                return;
+            }
+            String username = parts[0];
+            String title = parts[1];
+            String[] lines = parts[2].split("#");
+            Player player = MinecraftServer.getConnectionManager().getOnlinePlayerByUsername(username);
+            if (player != null) {
+                Sidebar sidebar = new Sidebar(MiniMessage.miniMessage().deserialize(title));
+                for (int i = 0; i < lines.length; i++) {
+                    String lineId = "line_" + i;
+                    String lineText = lines[i];
+                    sidebar.createLine(new Sidebar.ScoreboardLine(
+                            lineId,
+                            MiniMessage.miniMessage().deserialize(lineText),
+                            (lines.length - i),
+                            Sidebar.NumberFormat.blank()
+                    ));
+                }
+                sidebar.addViewer(player);
+                System.out.println("Scoreboard successfully updated for: " + username);
+            } else {
+                System.err.println("Player not found: " + username);
+            }
+        } catch (Exception e) {
+            System.err.println("Error handling scoreboard event: " + e.getMessage());
+        }
+    }
+
     public void createNametag(Object entityHolder, String name) {
         Component displayName = Main.mm.deserialize(name);
         Entity entity = new Entity(EntityType.TEXT_DISPLAY);

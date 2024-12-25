@@ -20,8 +20,9 @@ public class NebulaAPI {
         Main.globalEventHandler.addListener(PlayerPluginMessageEvent.class, event -> {
             String identifier = event.getIdentifier();
             String message = event.getMessageString();
-            System.out.println("Channel: " + identifier + " Message: " + message);
             Player player = event.getPlayer();
+            if(!identifier.equals("nebula:main") && !identifier.equals("nebula:scoreboard")) { return;}
+            System.out.println("Channel: " + identifier + " Message: " + message);
             int attempts = 0;
             while (attempts < 10) {
                 if (player.getPlayerConnection().getConnectionState().equals(ConnectionState.PLAY) && player.getInstance() != null) {

@@ -18,13 +18,12 @@ import net.minestom.server.timer.TaskSchedule;
 
 public class NebulaAPI {
     public NebulaAPI() {
-        Main.globalEventHandler.addListener(PlayerDisconnectEvent.class, event -> event.getPlayer().getPassengers().forEach(Entity::remove));
+        Main.globalEventHandler.addListener(PlayerDisconnectEvent.class, event -> clearPassengers(event.getPlayer()));
         Main.globalEventHandler.addListener(PlayerPluginMessageEvent.class, event -> {
             String identifier = event.getIdentifier();
             String message = event.getMessageString();
             Player player = event.getPlayer();
             if (!identifier.equals("nebula:main") && !identifier.equals("nebula:scoreboard")) { return; }
-            System.out.println("Channel: " + identifier + " Message: " + message);
             final int[] attempts = {0};
             final Task[] taskHolder = new Task[1];
             taskHolder[0] = MinecraftServer.getSchedulerManager().buildTask(() -> {
@@ -44,22 +43,19 @@ public class NebulaAPI {
             }).repeat(TaskSchedule.seconds(1)).delay(TaskSchedule.seconds(1)).schedule();
         });
     }
-
     private void handleNametagEvent(String message) {
         try {
             String[] parts = message.split(":");
             String playerName = parts[0];
             String newName = parts[1].split("#")[2] + playerName;
             Player player = MinecraftServer.getConnectionManager().getOnlinePlayerByUsername(playerName);
-            if (player != null && player.getPassengers().isEmpty()) {
-                System.out.println("Player: " + playerName + " received name: " + newName);
+            if (player != null) {
                 createNametag(player, newName);
             }
         } catch (Exception e) {
             System.err.println("Error handling nametag event: " + e.getMessage());
         }
     }
-
     private void handleScoreboardEvent(String message) {
         try {
             String[] parts = message.split("&");
@@ -92,7 +88,6 @@ public class NebulaAPI {
             System.err.println("Error handling scoreboard event: " + e.getMessage());
         }
     }
-
     public void createNametag(Object entityHolder, String name) {
         Component displayName = Main.mm.deserialize(name);
         Entity entity = new Entity(EntityType.TEXT_DISPLAY);
@@ -103,8 +98,13 @@ public class NebulaAPI {
         meta.setShadow(true);
         meta.setTranslation(new Vec(0, 0.3, 0));
         if (entityHolder instanceof Player player) {
+            clearPassengers(player);
             player.addPassenger(entity);
             player.setDisplayName(displayName);
+            System.out.println("Nametag successfully updated for: " + player.getUsername() + ", with: " + displayName);
         }
+    }
+    private void clearPassengers(Player player) {
+        player.getPassengers().forEach(Entity::remove);
     }
 }

@@ -15,6 +15,7 @@ import net.minestom.server.network.ConnectionState;
 import net.minestom.server.scoreboard.Sidebar;
 import net.minestom.server.timer.Task;
 import net.minestom.server.timer.TaskSchedule;
+import static de.voasis.Main.logger;
 
 public class NebulaAPI {
     public NebulaAPI() {
@@ -43,6 +44,7 @@ public class NebulaAPI {
             }).repeat(TaskSchedule.seconds(1)).delay(TaskSchedule.seconds(1)).schedule();
         });
     }
+
     private void handleNametagEvent(String message) {
         try {
             String[] parts = message.split(":");
@@ -56,6 +58,7 @@ public class NebulaAPI {
             System.err.println("Error handling nametag event: " + e.getMessage());
         }
     }
+
     private void handleScoreboardEvent(String message) {
         try {
             String[] parts = message.split("&");
@@ -80,14 +83,15 @@ public class NebulaAPI {
                     ));
                 }
                 sidebar.addViewer(player);
-                System.out.println("Scoreboard successfully updated for: " + username);
+                logger.info("Scoreboard successfully updated for: " + username);
             } else {
-                System.err.println("Player not found: " + username);
+                logger.info("Player not found: " + username);
             }
         } catch (Exception e) {
-            System.err.println("Error handling scoreboard event: " + e.getMessage());
+            logger.info("Error handling scoreboard event: " + e.getMessage());
         }
     }
+
     public void createNametag(Object entityHolder, String name) {
         Component displayName = Main.mm.deserialize(name);
         Entity entity = new Entity(EntityType.TEXT_DISPLAY);
@@ -101,9 +105,10 @@ public class NebulaAPI {
             clearPassengers(player);
             player.addPassenger(entity);
             player.setDisplayName(displayName);
-            System.out.println("Nametag successfully updated for: " + player.getUsername() + ", with: " + displayName);
+            logger.info("Nametag successfully updated for: " + player.getUsername() + ", with: " + displayName);
         }
     }
+
     private void clearPassengers(Player player) {
         player.getPassengers().forEach(Entity::remove);
     }

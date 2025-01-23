@@ -1,6 +1,7 @@
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.voasis</groupId>
     <artifactId>SimpleDuels</artifactId>
@@ -9,8 +10,14 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.release>21</maven.compiler.release>
     </properties>
     <dependencies>
+        <dependency>
+            <groupId>de.voasis</groupId>
+            <artifactId>NebulaAPI</artifactId>
+            <version>0.1-SNAPSHOT</version>
+        </dependency>
         <dependency>
             <groupId>net.minestom</groupId>
             <artifactId>minestom-snapshots</artifactId>
@@ -26,11 +33,6 @@
             <artifactId>slf4j-simple</artifactId>
             <version>2.0.7</version>
         </dependency>
-        <dependency>
-            <groupId>de.voasis</groupId>
-            <artifactId>NebulaAPI</artifactId>
-            <version>0.1-SNAPSHOT</version>
-        </dependency>
     </dependencies>
     <repositories>
         <repository>
@@ -39,8 +41,15 @@
         </repository>
     </repositories>
     <build>
-        <finalName>server</finalName>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
+                <configuration>
+                    <release>21</release>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
@@ -48,13 +57,25 @@
                 <executions>
                     <execution>
                         <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
                         <configuration>
-                            <createDependencyReducedPom>false</createDependencyReducedPom>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>de.voasis.Main</mainClass>
                                 </transformer>
                             </transformers>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/LICENSE.txt</exclude>
+                                        <exclude>META-INF/versions/**</exclude>
+                                        <exclude>META-INF/MANIFEST.MF</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
                         </configuration>
                     </execution>
                 </executions>

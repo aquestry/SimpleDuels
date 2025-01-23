@@ -1,7 +1,6 @@
 package de.voasis;
 
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Player;
@@ -27,7 +26,6 @@ public class Main {
     private static InstanceContainer instanceContainer;
     private static final Random random = new Random();
     public static GlobalEventHandler globalEventHandler;
-    public static MiniMessage mm = MiniMessage.miniMessage();
     public static final Logger logger = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) {
@@ -38,7 +36,7 @@ public class Main {
         var vsecret = System.getenv("PAPER_VELOCITY_SECRET");
         if (vsecret != null) { VelocityProxy.enable(vsecret); }
         globalEventHandler = MinecraftServer.getGlobalEventHandler();
-        new NebulaAPI();
+        new NebulaAPI(globalEventHandler, logger);
         globalEventHandler.addListener(AsyncPlayerConfigurationEvent.class, event -> {
             Player player = event.getPlayer();
             Pos randomSpawnPoint = new Pos(

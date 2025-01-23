@@ -5,6 +5,7 @@
   <artifactId>SimpleDuels</artifactId>
   <version>1.0</version>
   <build>
+    <finalName>server</finalName>
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>

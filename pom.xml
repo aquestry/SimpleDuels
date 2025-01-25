@@ -14,9 +14,9 @@
     </properties>
     <dependencies>
         <dependency>
-            <groupId>de.voasis</groupId>
-            <artifactId>NebulaAPI</artifactId>
-            <version>0.1-SNAPSHOT</version>
+            <groupId>com.github.aquestry</groupId>
+            <artifactId>nebulaAPI</artifactId>
+            <version>173b66a066</version>
         </dependency>
         <dependency>
             <groupId>net.minestom</groupId>
@@ -36,8 +36,8 @@
     </dependencies>
     <repositories>
         <repository>
-            <id>github</id>
-            <url>https://maven.pkg.github.com/aquestry/NebulaAPI</url>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
         </repository>
     </repositories>
     <build>

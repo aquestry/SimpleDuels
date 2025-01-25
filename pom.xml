@@ -71,9 +71,10 @@
                                 <filter>
                                     <artifact>*:*</artifact>
                                     <excludes>
-                                        <exclude>META-INF/LICENSE.txt</exclude>
-                                        <exclude>META-INF/versions/**</exclude>
-                                        <exclude>META-INF/MANIFEST.MF</exclude>
+                                        <exclude>**/LICENSE.txt</exclude>
+                                        <exclude>**/versions/**</exclude>
+                                        <exclude>**/module-info.class</exclude>
+                                        <exclude>**/MANIFEST.MF</exclude>
                                     </excludes>
                                 </filter>
                             </filters>
